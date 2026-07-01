@@ -106,30 +106,56 @@ public class Serie {
         return texto(nome).equalsIgnoreCase(texto(outra.nome));
     }
 
-    public String getNomeExibicao() { return valorOuPadrao(nome, "Sem nome"); }
-    public String getIdiomaExibicao() { return valorOuPadrao(idioma, "Nao informado"); }
+    public String getNomeExibicao() {
+        return valorOuPadrao(nome, "Sem nome");
+    }
+
+    public String getIdiomaExibicao() {
+        return valorOuPadrao(idioma, "Nao informado");
+    }
+
     public String getGenerosExibicao() {
-        if (generos == null || generos.isEmpty()) return "Nao informado";
+        if (generos == null || generos.isEmpty())
+            return "Nao informado";
         return String.join(", ", generos);
     }
-    public String getNotaExibicao() { return nota < 0 ? "Sem nota" : String.valueOf(nota); }
+
+    public String getNotaExibicao() {
+        return nota < 0 ? "Sem nota" : String.valueOf(nota);
+    }
+
     public String getEstadoExibicao() {
         String valor = valorOuPadrao(estado, "Nao informado");
-        if (valor.equalsIgnoreCase("Running")) return "Em exibicao";
-        if (valor.equalsIgnoreCase("Ended")) return "Concluida";
-        if (valor.equalsIgnoreCase("To Be Determined")) return "A definir";
-        if (valor.equalsIgnoreCase("In Development")) return "Em desenvolvimento";
+        if (valor.equalsIgnoreCase("Running"))
+            return "Em exibicao";
+        if (valor.equalsIgnoreCase("Ended"))
+            return "Concluida";
+        if (valor.equalsIgnoreCase("To Be Determined"))
+            return "A definir";
+        if (valor.equalsIgnoreCase("In Development"))
+            return "Em desenvolvimento";
         return valor;
     }
-    public String getDataEstreiaExibicao() { return valorOuPadrao(dataEstreia, "Nao informada"); }
-    public String getDataTerminoExibicao() { return valorOuPadrao(dataTermino, "Nao informada"); }
-    public String getEmissoraExibicao() { return valorOuPadrao(emissora, "Nao informada"); }
+
+    public String getDataEstreiaExibicao() {
+        return valorOuPadrao(dataEstreia, "Nao informada");
+    }
+
+    public String getDataTerminoExibicao() {
+        return valorOuPadrao(dataTermino, "Nao informada");
+    }
+
+    public String getEmissoraExibicao() {
+        return valorOuPadrao(emissora, "Nao informada");
+    }
 
     private String valorOuPadrao(String valor, String padrao) {
         return texto(valor).isEmpty() ? padrao : valor.trim();
     }
 
-    private String texto(String valor) { return valor == null ? "" : valor.trim(); }
+    private String texto(String valor) {
+        return valor == null ? "" : valor.trim();
+    }
 
     public String toString() {
         return getNomeExibicao();

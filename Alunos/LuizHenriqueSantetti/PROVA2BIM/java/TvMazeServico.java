@@ -6,15 +6,16 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class TvMazeServico {
     private final JsonSimples json = new JsonSimples();
 
     public ArrayList<Serie> buscarSeries(String nome) throws Exception {
         String pesquisa = nome == null ? "" : nome.trim();
-        if (pesquisa.isEmpty()) throw new Exception("Digite o nome de uma serie.");
-        if (pesquisa.length() > 150) throw new Exception("O texto da pesquisa e muito grande.");
+        if (pesquisa.isEmpty())
+            throw new Exception("Digite o nome de uma serie.");
+        if (pesquisa.length() > 150)
+            throw new Exception("O texto da pesquisa e muito grande.");
 
         String endereco = "https://api.tvmaze.com/search/shows?q="
                 + URLEncoder.encode(pesquisa, StandardCharsets.UTF_8);
@@ -26,10 +27,12 @@ public class TvMazeServico {
             conexao.setReadTimeout(10000);
             conexao.setRequestProperty("Accept", "application/json");
             int resposta = conexao.getResponseCode();
-            if (resposta != 200) throw new Exception("O TVMaze respondeu com o codigo HTTP " + resposta + ".");
+            if (resposta != 200)
+                throw new Exception("O TVMaze respondeu com o codigo HTTP " + resposta + ".");
             String texto = lerResposta(conexao.getInputStream());
             Object raiz = json.ler(texto);
-            if (!(raiz instanceof ArrayList)) throw new Exception("A resposta do TVMaze estava invalida.");
+            if (!(raiz instanceof ArrayList))
+                throw new Exception("A resposta do TVMaze estava invalida.");
             return converterResultados((ArrayList<?>) raiz);
         } catch (java.net.UnknownHostException e) {
             throw new Exception("Nao foi possivel conectar ao TVMaze. Verifique sua internet.");
@@ -38,7 +41,8 @@ public class TvMazeServico {
         } catch (java.io.IOException e) {
             throw new Exception("Nao foi possivel conectar ao TVMaze. Verifique sua internet.");
         } finally {
-            if (conexao != null) conexao.disconnect();
+            if (conexao != null)
+                conexao.disconnect();
         }
     }
 
@@ -46,40 +50,49 @@ public class TvMazeServico {
         BufferedReader leitor = new BufferedReader(new InputStreamReader(entrada, StandardCharsets.UTF_8));
         StringBuilder resposta = new StringBuilder();
         String linha;
-        while ((linha = leitor.readLine()) != null) resposta.append(linha);
+        while ((linha = leitor.readLine()) != null)
+            resposta.append(linha);
         leitor.close();
-        if (resposta.toString().trim().isEmpty()) throw new Exception("O TVMaze enviou uma resposta vazia.");
+        if (resposta.toString().trim().isEmpty())
+            throw new Exception("O TVMaze enviou uma resposta vazia.");
         return resposta.toString();
     }
 
     private ArrayList<Serie> converterResultados(ArrayList<?> resultados) {
         ArrayList<Serie> series = new ArrayList<Serie>();
         for (Object item : resultados) {
-            if (!(item instanceof Map)) continue;
-            Object show = ((Map<?, ?>) item).get("show");
-            if (show instanceof Map) series.add(converterSerie((Map<?, ?>) show));
+            if (!(item instanceof JsonObjeto))
+                continue;
+            Object show = ((JsonObjeto) item).pegar("show");
+            if (show instanceof JsonObjeto)
+                series.add(converterSerie((JsonObjeto) show));
         }
         return series;
     }
 
-    private Serie converterSerie(Map<?, ?> show) {
-        int id = numeroInteiro(show.get("id"), -1);
-        String nome = texto(show.get("name"));
-        String idioma = texto(show.get("language"));
+    private Serie converterSerie(JsonObjeto show) {
+        int id = numeroInteiro(show.pegar("id"), -1);
+        String nome = texto(show.pegar("name"));
+        String idioma = texto(show.pegar("language"));
         ArrayList<String> generos = new ArrayList<String>();
-        Object listaGeneros = show.get("genres");
+        Object listaGeneros = show.pegar("genres");
         if (listaGeneros instanceof ArrayList) {
-            for (Object genero : (ArrayList<?>) listaGeneros) if (genero != null) generos.add(genero.toString());
+            for (Object genero : (ArrayList<?>) listaGeneros)
+                if (genero != null)
+                    generos.add(genero.toString());
         }
         double nota = -1;
-        Object avaliacao = show.get("rating");
-        if (avaliacao instanceof Map) nota = numeroDouble(((Map<?, ?>) avaliacao).get("average"), -1);
+        Object avaliacao = show.pegar("rating");
+        if (avaliacao instanceof JsonObjeto)
+            nota = numeroDouble(((JsonObjeto) avaliacao).pegar("average"), -1);
         String emissora = "";
-        Object network = show.get("network");
-        if (!(network instanceof Map)) network = show.get("webChannel");
-        if (network instanceof Map) emissora = texto(((Map<?, ?>) network).get("name"));
-        return new Serie(id, nome, idioma, generos, nota, texto(show.get("status")),
-                texto(show.get("premiered")), texto(show.get("ended")), emissora);
+        Object network = show.pegar("network");
+        if (!(network instanceof JsonObjeto))
+            network = show.pegar("webChannel");
+        if (network instanceof JsonObjeto)
+            emissora = texto(((JsonObjeto) network).pegar("name"));
+        return new Serie(id, nome, idioma, generos, nota, texto(show.pegar("status")),
+                texto(show.pegar("premiered")), texto(show.pegar("ended")), emissora);
     }
 
     private String texto(Object valor) {

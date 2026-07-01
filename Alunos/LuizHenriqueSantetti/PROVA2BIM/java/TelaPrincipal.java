@@ -52,7 +52,7 @@ public class TelaPrincipal extends JFrame {
         abas.addTab("Busca", criarAbaBusca());
         abas.addTab("Favoritos", criarAbaLista(dados.getFavoritos(), "Favoritos"));
         abas.addTab("Ja Assistidas", criarAbaLista(dados.getAssistidas(), "Ja Assistidas"));
-        abas.addTab("Quero Assistir", criarAbaLista(dados.getQueroAssistir(), "Quero Assistir"));
+        abas.addTab("Tô querendo assistir", criarAbaLista(dados.getQueroAssistir(), "Quero Assistir"));
         add(abas, BorderLayout.CENTER);
 
         addWindowListener(new WindowAdapter() {
@@ -101,7 +101,10 @@ public class TelaPrincipal extends JFrame {
         favorito.addActionListener(e -> adicionarResultado(dados.getFavoritos(), "Favoritos"));
         assistida.addActionListener(e -> adicionarResultado(dados.getAssistidas(), "Ja Assistidas"));
         quero.addActionListener(e -> adicionarResultado(dados.getQueroAssistir(), "Quero Assistir"));
-        botoes.add(detalhes); botoes.add(favorito); botoes.add(assistida); botoes.add(quero);
+        botoes.add(detalhes);
+        botoes.add(favorito);
+        botoes.add(assistida);
+        botoes.add(quero);
         painel.add(botoes, BorderLayout.SOUTH);
         return painel;
     }
@@ -109,9 +112,12 @@ public class TelaPrincipal extends JFrame {
     private JPanel criarAbaLista(ArrayList<Serie> lista, String nomeLista) {
         JPanel painel = new JPanel(new BorderLayout());
         JTable tabela = criarTabela();
-        if (nomeLista.equals("Favoritos")) tabelaFavoritos = tabela;
-        else if (nomeLista.equals("Ja Assistidas")) tabelaAssistidas = tabela;
-        else tabelaQueroAssistir = tabela;
+        if (nomeLista.equals("Favoritos"))
+            tabelaFavoritos = tabela;
+        else if (nomeLista.equals("Ja Assistidas"))
+            tabelaAssistidas = tabela;
+        else
+            tabelaQueroAssistir = tabela;
         painel.add(new JScrollPane(tabela), BorderLayout.CENTER);
 
         JPanel controles = new JPanel(new GridLayout(2, 1));
@@ -124,17 +130,23 @@ public class TelaPrincipal extends JFrame {
                 dados.ordenarLista(lista, (String) criterios.getSelectedItem());
                 atualizarTabela(tabela, lista);
                 salvarOuAvisar();
-            } catch (Exception erro) { mostrarErro("Nao foi possivel ordenar a lista."); }
+            } catch (Exception erro) {
+                mostrarErro("Nao foi possivel ordenar a lista.");
+            }
         });
-        ordenacao.add(new JLabel("Ordenar por:")); ordenacao.add(criterios); ordenacao.add(ordenar);
+        ordenacao.add(new JLabel("Ordenar por:"));
+        ordenacao.add(criterios);
+        ordenacao.add(ordenar);
 
         JPanel acoes = new JPanel(new FlowLayout());
         JButton detalhes = new JButton("Ver detalhes");
         JButton remover = new JButton("Remover");
         detalhes.addActionListener(e -> mostrarDetalhes(selecionar(tabela, lista)));
         remover.addActionListener(e -> removerSerie(tabela, lista));
-        acoes.add(detalhes); acoes.add(remover);
-        controles.add(ordenacao); controles.add(acoes);
+        acoes.add(detalhes);
+        acoes.add(remover);
+        controles.add(ordenacao);
+        controles.add(acoes);
         painel.add(controles, BorderLayout.SOUTH);
         return painel;
     }
@@ -142,7 +154,9 @@ public class TelaPrincipal extends JFrame {
     private JTable criarTabela() {
         DefaultTableModel modelo = new DefaultTableModel(
                 new Object[] { "Nome", "Idioma", "Generos", "Nota", "Estado", "Estreia" }, 0) {
-            public boolean isCellEditable(int linha, int coluna) { return false; }
+            public boolean isCellEditable(int linha, int coluna) {
+                return false;
+            }
         };
         JTable tabela = new JTable(modelo);
         tabela.setAutoCreateRowSorter(false);
@@ -152,24 +166,37 @@ public class TelaPrincipal extends JFrame {
 
     private void pesquisar() {
         String nome = campoPesquisa.getText() == null ? "" : campoPesquisa.getText().trim();
-        if (nome.isEmpty()) { mostrarErro("Digite o nome de uma serie."); return; }
-        if (nome.length() > 150) { mostrarErro("O texto da pesquisa e muito grande."); return; }
-        if (pesquisando) return;
+        if (nome.isEmpty()) {
+            mostrarErro("Digite o nome de uma serie.");
+            return;
+        }
+        if (nome.length() > 150) {
+            mostrarErro("O texto da pesquisa e muito grande.");
+            return;
+        }
+        if (pesquisando)
+            return;
         pesquisando = true;
         botaoPesquisar.setEnabled(false);
         textoStatus.setText("Pesquisando...");
 
-        // SwingWorker executa a consulta fora da tela para a janela continuar respondendo.
+        // SwingWorker executa a consulta fora da tela para a janela continuar
+        // respondendo.
         SwingWorker<ArrayList<Serie>, Void> trabalho = new SwingWorker<ArrayList<Serie>, Void>() {
-            protected ArrayList<Serie> doInBackground() throws Exception { return servico.buscarSeries(nome); }
+            protected ArrayList<Serie> doInBackground() throws Exception {
+                return servico.buscarSeries(nome);
+            }
+
             protected void done() {
                 try {
                     resultados = get();
                     atualizarTabela(tabelaBusca, resultados);
-                    textoStatus.setText(resultados.isEmpty() ? "Nenhuma serie encontrada." : resultados.size() + " resultado(s).");
+                    textoStatus.setText(
+                            resultados.isEmpty() ? "Nenhuma serie encontrada." : resultados.size() + " resultado(s).");
                 } catch (Exception e) {
                     Throwable causa = e.getCause();
-                    mostrarErro(causa == null || causa.getMessage() == null ? "Nao foi possivel consultar o TVMaze." : causa.getMessage());
+                    mostrarErro(causa == null || causa.getMessage() == null ? "Nao foi possivel consultar o TVMaze."
+                            : causa.getMessage());
                     textoStatus.setText("Falha na pesquisa.");
                 } finally {
                     pesquisando = false;
@@ -182,8 +209,12 @@ public class TelaPrincipal extends JFrame {
 
     private void adicionarResultado(ArrayList<Serie> lista, String nomeLista) {
         Serie serie = selecionar(tabelaBusca, resultados);
-        if (serie == null) return;
-        if (!dados.adicionar(lista, serie)) { mostrarErro("Esta serie ja esta na lista."); return; }
+        if (serie == null)
+            return;
+        if (!dados.adicionar(lista, serie)) {
+            mostrarErro("Esta serie ja esta na lista.");
+            return;
+        }
         atualizarTodasTabelas();
         salvarOuAvisar();
         JOptionPane.showMessageDialog(this, "Serie adicionada em " + nomeLista + ".");
@@ -191,10 +222,14 @@ public class TelaPrincipal extends JFrame {
 
     private void removerSerie(JTable tabela, ArrayList<Serie> lista) {
         int linha = tabela.getSelectedRow();
-        if (linha < 0 || linha >= lista.size()) { mostrarErro("Selecione uma serie primeiro."); return; }
+        if (linha < 0 || linha >= lista.size()) {
+            mostrarErro("Selecione uma serie primeiro.");
+            return;
+        }
         int resposta = JOptionPane.showConfirmDialog(this, "Deseja remover esta serie?", "Confirmar",
                 JOptionPane.YES_NO_OPTION);
-        if (resposta != JOptionPane.YES_OPTION) return;
+        if (resposta != JOptionPane.YES_OPTION)
+            return;
         lista.remove(linha);
         atualizarTabela(tabela, lista);
         salvarOuAvisar();
@@ -202,12 +237,16 @@ public class TelaPrincipal extends JFrame {
 
     private Serie selecionar(JTable tabela, ArrayList<Serie> lista) {
         int linha = tabela.getSelectedRow();
-        if (linha < 0 || linha >= lista.size()) { mostrarErro("Selecione uma serie primeiro."); return null; }
+        if (linha < 0 || linha >= lista.size()) {
+            mostrarErro("Selecione uma serie primeiro.");
+            return null;
+        }
         return lista.get(linha);
     }
 
     private void mostrarDetalhes(Serie serie) {
-        if (serie == null) return;
+        if (serie == null)
+            return;
         String detalhes = "Nome: " + serie.getNomeExibicao()
                 + "\nIdioma: " + serie.getIdiomaExibicao()
                 + "\nGeneros: " + serie.getGenerosExibicao()
@@ -221,8 +260,12 @@ public class TelaPrincipal extends JFrame {
 
     private void alterarNome() {
         String nome = JOptionPane.showInputDialog(this, "Digite o novo nome:", dados.getUsuario().getNome());
-        if (nome == null) return;
-        if (nome.trim().isEmpty()) { mostrarErro("O nome nao pode ficar vazio."); return; }
+        if (nome == null)
+            return;
+        if (nome.trim().isEmpty()) {
+            mostrarErro("O nome nao pode ficar vazio.");
+            return;
+        }
         dados.getUsuario().setNome(nome);
         textoBoasVindas.setText("Ola, " + dados.getUsuario().getNome() + "!");
         salvarOuAvisar();
@@ -234,24 +277,32 @@ public class TelaPrincipal extends JFrame {
             atualizarTabela(tabelaFavoritos, dados.getFavoritos());
             atualizarTabela(tabelaAssistidas, dados.getAssistidas());
             atualizarTabela(tabelaQueroAssistir, dados.getQueroAssistir());
-        } catch (Exception e) { mostrarErro("Nao foi possivel atualizar uma tabela."); }
+        } catch (Exception e) {
+            mostrarErro("Nao foi possivel atualizar uma tabela.");
+        }
     }
 
     private void atualizarTabela(JTable tabela, ArrayList<Serie> lista) {
-        if (tabela == null) return;
+        if (tabela == null)
+            return;
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
         modelo.setRowCount(0);
-        if (lista == null) return;
+        if (lista == null)
+            return;
         for (Serie serie : lista) {
-            if (serie != null) modelo.addRow(new Object[] { serie.getNomeExibicao(), serie.getIdiomaExibicao(),
-                    serie.getGenerosExibicao(), serie.getNotaExibicao(), serie.getEstadoExibicao(),
-                    serie.getDataEstreiaExibicao() });
+            if (serie != null)
+                modelo.addRow(new Object[] { serie.getNomeExibicao(), serie.getIdiomaExibicao(),
+                        serie.getGenerosExibicao(), serie.getNotaExibicao(), serie.getEstadoExibicao(),
+                        serie.getDataEstreiaExibicao() });
         }
     }
 
     private void salvarOuAvisar() {
-        if (!persistencia.salvarDados(dados)) mostrarErro("Nao foi possivel salvar os dados.");
+        if (!persistencia.salvarDados(dados))
+            mostrarErro("Nao foi possivel salvar os dados.");
     }
 
-    private void mostrarErro(String mensagem) { JOptionPane.showMessageDialog(this, mensagem, "Aviso", JOptionPane.WARNING_MESSAGE); }
+    private void mostrarErro(String mensagem) {
+        JOptionPane.showMessageDialog(this, mensagem, "Aviso", JOptionPane.WARNING_MESSAGE);
+    }
 }
