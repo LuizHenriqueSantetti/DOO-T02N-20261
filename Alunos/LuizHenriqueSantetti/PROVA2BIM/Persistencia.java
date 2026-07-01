@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -97,14 +96,30 @@ public class Persistencia {
         return resultado;
     }
 
-    private String texto(Object valor) { return valor == null ? "" : valor.toString(); }
-    private int inteiro(Object valor, int padrao) { return valor instanceof Number ? ((Number) valor).intValue() : padrao; }
-    private double decimal(Object valor, double padrao) { return valor instanceof Number ? ((Number) valor).doubleValue() : padrao; }
-    public boolean isDadosPadraoUsados() { return dadosPadraoUsados; }
-    public String getAvisoCarregamento() { return avisoCarregamento; }
-    public Path getArquivo() { return arquivo.toAbsolutePath(); }
+    private String texto(Object valor) {
+        if (valor == null) return "";
+        return valor.toString();
+    }
 
-    private String formatarJson(String compacto) throws IOException {
+    private int inteiro(Object valor, int padrao) {
+        if (valor instanceof Number) return ((Number) valor).intValue();
+        return padrao;
+    }
+
+    private double decimal(Object valor, double padrao) {
+        if (valor instanceof Number) return ((Number) valor).doubleValue();
+        return padrao;
+    }
+
+    public boolean isDadosPadraoUsados() {
+        return dadosPadraoUsados;
+    }
+
+    public String getAvisoCarregamento() {
+        return avisoCarregamento;
+    }
+
+    private String formatarJson(String compacto) {
         StringBuilder bonito = new StringBuilder();
         boolean string = false, escape = false;
         int nivel = 0;

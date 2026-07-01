@@ -10,22 +10,14 @@ import java.util.Map;
 
 public class TvMazeServico {
     private final JsonSimples json = new JsonSimples();
-    private String enderecoBase;
-
-    public TvMazeServico() {
-        enderecoBase = "https://api.tvmaze.com/search/shows?q=";
-    }
-
-    TvMazeServico(String enderecoBase) {
-        this.enderecoBase = enderecoBase;
-    }
 
     public ArrayList<Serie> buscarSeries(String nome) throws Exception {
         String pesquisa = nome == null ? "" : nome.trim();
         if (pesquisa.isEmpty()) throw new Exception("Digite o nome de uma serie.");
         if (pesquisa.length() > 150) throw new Exception("O texto da pesquisa e muito grande.");
 
-        String endereco = enderecoBase + URLEncoder.encode(pesquisa, StandardCharsets.UTF_8);
+        String endereco = "https://api.tvmaze.com/search/shows?q="
+                + URLEncoder.encode(pesquisa, StandardCharsets.UTF_8);
         HttpURLConnection conexao = null;
         try {
             conexao = (HttpURLConnection) new URL(endereco).openConnection();
@@ -90,7 +82,24 @@ public class TvMazeServico {
                 texto(show.get("premiered")), texto(show.get("ended")), emissora);
     }
 
-    private String texto(Object valor) { return valor == null ? "" : valor.toString(); }
-    private int numeroInteiro(Object valor, int padrao) { return valor instanceof Number ? ((Number) valor).intValue() : padrao; }
-    private double numeroDouble(Object valor, double padrao) { return valor instanceof Number ? ((Number) valor).doubleValue() : padrao; }
+    private String texto(Object valor) {
+        if (valor == null) {
+            return "";
+        }
+        return valor.toString();
+    }
+
+    private int numeroInteiro(Object valor, int padrao) {
+        if (valor instanceof Number) {
+            return ((Number) valor).intValue();
+        }
+        return padrao;
+    }
+
+    private double numeroDouble(Object valor, double padrao) {
+        if (valor instanceof Number) {
+            return ((Number) valor).doubleValue();
+        }
+        return padrao;
+    }
 }

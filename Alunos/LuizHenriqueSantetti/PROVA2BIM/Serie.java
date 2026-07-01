@@ -24,28 +24,85 @@ public class Serie {
         this.emissora = emissora;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
-    public String getIdioma() { return idioma; }
-    public void setIdioma(String idioma) { this.idioma = idioma; }
-    public ArrayList<String> getGeneros() { return generos; }
-    public void setGeneros(ArrayList<String> generos) { this.generos = generos; }
-    public double getNota() { return nota; }
-    public void setNota(double nota) { this.nota = nota; }
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
-    public String getDataEstreia() { return dataEstreia; }
-    public void setDataEstreia(String dataEstreia) { this.dataEstreia = dataEstreia; }
-    public String getDataTermino() { return dataTermino; }
-    public void setDataTermino(String dataTermino) { this.dataTermino = dataTermino; }
-    public String getEmissora() { return emissora; }
-    public void setEmissora(String emissora) { this.emissora = emissora; }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getIdioma() {
+        return idioma;
+    }
+
+    public void setIdioma(String idioma) {
+        this.idioma = idioma;
+    }
+
+    public ArrayList<String> getGeneros() {
+        return generos;
+    }
+
+    public void setGeneros(ArrayList<String> generos) {
+        this.generos = generos;
+    }
+
+    public double getNota() {
+        return nota;
+    }
+
+    public void setNota(double nota) {
+        this.nota = nota;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public String getDataEstreia() {
+        return dataEstreia;
+    }
+
+    public void setDataEstreia(String dataEstreia) {
+        this.dataEstreia = dataEstreia;
+    }
+
+    public String getDataTermino() {
+        return dataTermino;
+    }
+
+    public void setDataTermino(String dataTermino) {
+        this.dataTermino = dataTermino;
+    }
+
+    public String getEmissora() {
+        return emissora;
+    }
+
+    public void setEmissora(String emissora) {
+        this.emissora = emissora;
+    }
 
     public boolean mesmaSerie(Serie outra) {
-        if (outra == null) return false;
-        if (id > 0 && outra.id > 0) return id == outra.id;
+        if (outra == null) {
+            return false;
+        }
+        if (id > 0 && outra.id > 0) {
+            return id == outra.id;
+        }
         return texto(nome).equalsIgnoreCase(texto(outra.nome));
     }
 
@@ -74,5 +131,7 @@ public class Serie {
 
     private String texto(String valor) { return valor == null ? "" : valor.trim(); }
 
-    public String toString() { return getNomeExibicao(); }
+    public String toString() {
+        return getNomeExibicao();
+    }
 }

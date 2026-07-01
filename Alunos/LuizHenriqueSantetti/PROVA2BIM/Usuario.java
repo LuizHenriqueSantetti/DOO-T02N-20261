@@ -5,10 +5,15 @@ public class Usuario {
         setNome(nome);
     }
 
-    public String getNome() { return nome; }
+    public String getNome() {
+        return nome;
+    }
 
     public void setNome(String nome) {
-        if (nome == null || nome.trim().isEmpty()) this.nome = "Usuario";
-        else this.nome = nome.trim();
+        if (nome == null || nome.trim().isEmpty()) {
+            this.nome = "Usuario";
+        } else {
+            this.nome = nome.trim();
+        }
     }
 }
